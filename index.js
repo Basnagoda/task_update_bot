@@ -2,7 +2,7 @@ const SlackBot = require('slackbots');
 const axios = require('axios');
 
 const bot = new SlackBot({
-  token: 'xoxb-1160973993026-1154923438406-41KrIJ0Uy7l1v3pEZ4ygTUbj',
+  token: 'xoxb-1160973993026-1154923438406-i7SjjIrggmBP2hdZ8GohX92W',
   name: 'task_update_bot'
 });
 
@@ -60,33 +60,28 @@ bot.on('message', data => {
   handleMessage(data);
 });
 
-// Respons to Data
+// Respond to Data
 function handleMessage(data) {
   if (!data)
     return;
+
+  let user = getUser(data);
+
    if (data.text.includes(OHAYO)) {
-    let user = getUser(data);
     let task = getUserTask(data);
-    if(task){
-      task.yesterday = -1;
-      task.today = -1;
-      task.blocker = -1;
-    }
+    reset(task);
     postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_2}`);
   } else if (data.text.includes(YES)) {
-    let user = getUser(data);
     let task = {user_id: user.id, yesterday: -1, today: -1, blocker: -1};
     tasks.push(task);
     postToUser(user.name, MSG_3);
   } else if (data.text.includes(POST)) {
     console.log('POST');
-    let user = getUser(data);
     let task = getUserTask(data);
     console.log(task);
     // tasks.splice(task);
     postToChannel(CHANNEL_TASK_UPDATE, task);
   } else if (getUserTask(data)) {
-    let user = getUser(data);
     let task = getUserTask(data);
     if (task.yesterday === -1) {
       task.yesterday = data.text;
@@ -101,6 +96,14 @@ function handleMessage(data) {
       postToUser(user.name, MSG_7);
     }
   }
+}
+
+function reset(task) {
+  if (!task)
+    return;
+  task.yesterday = -1;
+  task.today = -1;
+  task.blocker = -1;
 }
 
 function getUser(data) {
