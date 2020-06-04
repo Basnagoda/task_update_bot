@@ -2,7 +2,7 @@ const SlackBot = require('slackbots');
 const axios = require('axios');
 
 const bot = new SlackBot({
-  token: 'xoxb-YOUR-OWN-TOKEN',
+  token: 'xoxb-1160973993026-1154923438406-S2tpUbHWCrP1H7okym3CC8I4',
   name: 'jokebot'
 });
 
@@ -12,18 +12,43 @@ bot.on('start', () => {
     icon_emoji: ':smiley:'
   };
 
+  bot.getChannels().then(result => {
+    console.log('Channels...!!!');
+    console.log(result);
+  });
+
+  bot.getUsers().then(result => {
+    console.log('Users...!!!');
+    console.log(result);
+  });
+
+
   bot.postMessageToChannel(
-    'general',
-    'Get Ready To Laugh With @Jokebot!',
-    params
+      'general',
+      ' <form>\n' +
+      '  <label for="fname">First name:</label><br>\n' +
+      '  <input type="text" id="fname" name="fname"><br>\n' +
+      '  <label for="lname">Last name:</label><br>\n' +
+      '  <input type="text" id="lname" name="lname">\n' +
+      '</form> ',
+      params
   );
 });
 
 // Error Handler
 bot.on('error', err => console.log(err));
 
+
+// Open connection
+bot.on('open', () => console.log('Socket Opened...!!!'));
+
+// Close connection
+bot.on('close', () => console.log('Socket Closed...!!!'));
+
+
 // Message Handler
 bot.on('message', data => {
+  console.log(data);
   if (data.type !== 'message') {
     return;
   }
@@ -33,7 +58,11 @@ bot.on('message', data => {
 
 // Respons to Data
 function handleMessage(message) {
-  if (message.includes(' chucknorris')) {
+
+  if(!message)
+    return;
+  // console.log(message);
+  if (message.includes('chucknorris')) {
     chuckJoke();
   } else if (message.includes(' yomama')) {
     yoMamaJoke();
@@ -87,8 +116,8 @@ function runHelp() {
   };
 
   bot.postMessageToChannel(
-    'general',
-    `Type @jokebot with either 'chucknorris', 'yomama' or 'random' to get a joke`,
-    params
+      'general',
+      `Type $jokebot with either 'chucknorris', 'yomama' or 'random' to get a joke`,
+      params
   );
 }
