@@ -99,7 +99,10 @@ function handleMessage(data) {
     } else if (task.blocker === -1) {
       task.blocker = data.text;
       postToUser(user.name, MSG_6);
-      postToUser(user.name, `Summary`);
+
+      let yesterdayDate = getYesterdayDate();
+      let summary = getTaskUpdateSummary(user, task);
+      postToUser(user.name, "*[Task update on " + yesterdayDate + " ]*", summary);
       postToUser(user.name, MSG_7);
     }
   }
@@ -125,6 +128,10 @@ function postToUser(userChannel, message) {
   const params = {
     icon_emoji: ':laughing:'
   };
+  bot.postMessageToUser(userChannel, message, params);
+}
+
+function postToUser(userChannel, message, params) {
   bot.postMessageToUser(userChannel, message, params);
 }
 
