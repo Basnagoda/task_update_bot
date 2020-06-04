@@ -1,6 +1,6 @@
 # @Task Update Bot
 
-> Simple slackbot built with Node.js and Slackbots.js that tells random Chuck Norris and Yo Mama jokes.
+> Simple slackbot built with Node.js and Slackbots.js that does task update on scrum.
 
 ## APIs Used:
 [http://www.icndb.com/api/](http://www.icndb.com/api/)
@@ -26,8 +26,7 @@ npm start
 
 ### Author
 
-Brad Traversy
-[Traversy Media](http://www.traversymedia.com)
+Huubap Hackathon Team D
 
 ### Version
 
