@@ -21,6 +21,10 @@ const MSG_5 = 'Any blockers/roadblocks?';
 const MSG_6 = 'Thanks for the input, below is the summary:';
 const MSG_7 = 'Type \'POST\' to complete task update.';
 
+const MSG_8 = 'What I worked on previous working day:';
+const MSG_9 = 'What task I take today:';
+const MSG_10 = 'Blockers/Roadblocks:';
+
 let channels = [];
 let users = [];
 let tasks = [];
@@ -77,10 +81,13 @@ function handleMessage(data) {
     postToUser(user.name, MSG_3);
   } else if (data.text.includes(POST)) {
     console.log('POST');
+    let user = getUser(data);
     let task = getUserTask(data);
+    let yesterdayDate = getYesterdayDate();
+    let summary = getTaskUpdateSummary(user, task);
     console.log(task);
     // tasks.splice(task);
-    postToChannel(CHANNEL_TASK_UPDATE, task);
+    postToChannel(CHANNEL_TASK_UPDATE, "*[Task update on " + yesterdayDate + " ]*", summary);
   } else if (getUserTask(data)) {
     let task = getUserTask(data);
     if (task.yesterday === -1) {
@@ -128,6 +135,10 @@ function postToChannel(channel, message) {
   bot.postMessageToChannel(channel, message, params);
 }
 
+function postToChannel(channel, message, params) {
+  bot.postMessageToChannel(channel, message, params);
+}
+
 // Show Help Text
 function runHelp() {
   const params = {
@@ -139,4 +150,53 @@ function runHelp() {
       `Type $jokebot with either 'chucknorris', 'yomama' or 'random' to get a joke`,
       params
   );
+}
+
+function getYesterdayDate() {
+    var options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+    var today = new Date();
+    today.setDate(today.getDate() - 1);
+    var dateString = today.toLocaleDateString("en-US", options)
+    return dateString;
+}
+
+function getTaskUpdateSummary(user, task) {
+
+    let authorName = user.real_name
+    let yesterdayTask = task.yesterday
+    let todayTask = task.today
+    let blockers = task.blocker
+
+    var messageSummary = {
+        "icon_emoji": ":taskupdatebot:",
+        "attachments": [{
+            "mrkdwn_in": ["text"],
+            "color": "#36a64f",
+            "author_name": "" + authorName + "",
+            "author_icon": "https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4-300x300.png",
+            "fields": [{
+                    "title": "" + MSG_8 + "",
+                    "value": "" + yesterdayTask + "",
+                    "short": false
+                },
+                {
+                    "title": "" + MSG_9 + "",
+                    "value": "" + todayTask + "",
+                    "short": false
+
+                },
+                {
+                    "title": "" + MSG_10 + "",
+                    "value": "" + blockers + "",
+                    "short": true
+                }
+            ]
+        }]
+    }
+    return messageSummary;
 }
