@@ -78,7 +78,7 @@ function handleMessage(data) {
 
     let user = getUser(data);
 
-    if (data.text.includes(OHAYO)) {
+    if (data.text.toLowerCase().includes("ohayo")) {
         let task = getUserTask(data);
         if (task) {
             reset(task);
@@ -87,10 +87,10 @@ function handleMessage(data) {
             tasks.push(task);
         }
         postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_2}\n ${MSG_3}`);
-    } else if (data.text.includes(CHECKOUT)) {
+    } else if (data.text.toLowerCase().includes("checkout")) {
         postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_11}`);
     }
-    else if (data.text.includes(YES)) {
+    else if (data.text.toLowerCase().includes("yes")) {
         let summary = getLeaveSummary(user);
         postToChannel(CHANNEL_TASK_UPDATE, "*Attention !!!*", summary);
     }
