@@ -14,7 +14,7 @@ const CHANNEL_GENERAL = 'general';
 const CHANNEL_TASK_UPDATE = 'huubap_task_update';
 
 const MSG_1 = 'Hello';
-const MSG_2 = ', are you ready to send your task update? Type \'YES\' or \'NO\'';
+const MSG_2 = ' Good morning!!! , Let\'s start your task update.';
 const MSG_3 = 'What task have you done on previous working day?';
 const MSG_4 = 'What task will you take on today?';
 const MSG_5 = 'Any blockers/roadblocks?';
@@ -72,22 +72,15 @@ function handleMessage(data) {
   let user = getUser(data);
 
    if (data.text.includes(OHAYO)) {
+
     let task = getUserTask(data);
-    reset(task);
-    postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_2}`);
-  } else if (data.text.includes(YES)) {
-    let task = {user_id: user.id, yesterday: -1, today: -1, blocker: -1};
-    tasks.push(task);
-    postToUser(user.name, MSG_3);
-  } else if (data.text.includes(POST)) {
-    console.log('POST');
-    let user = getUser(data);
-    let task = getUserTask(data);
-    let yesterdayDate = getYesterdayDate();
-    let summary = getTaskUpdateSummary(user, task);
-    console.log(task);
-    // tasks.splice(task);
-    postToChannel(CHANNEL_TASK_UPDATE, "*[Task update on " + yesterdayDate + " ]*", summary);
+    if(task){
+        reset(task);
+    } else {
+        task = {user_id: user.id, yesterday: -1, today: -1, blocker: -1};
+        tasks.push(task);
+    }
+    postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_2}\n ${MSG_3}`);
   } else if (getUserTask(data)) {
     let task = getUserTask(data);
     if (task.yesterday === -1) {
@@ -103,7 +96,7 @@ function handleMessage(data) {
       let yesterdayDate = getYesterdayDate();
       let summary = getTaskUpdateSummary(user, task);
       postToUser(user.name, "*[Task update on " + yesterdayDate + " ]*", summary);
-      postToUser(user.name, MSG_7);
+      postToChannel(CHANNEL_TASK_UPDATE, "*[Task update on " + yesterdayDate + " ]*", summary);
     }
   }
 }
