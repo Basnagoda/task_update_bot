@@ -2,13 +2,24 @@ const SlackBot = require('slackbots');
 const axios = require('axios');
 
 const bot = new SlackBot({
-  token: 'xoxb-1160973993026-1154923438406-jWrA84TyqEq4QonpRyItl2b4',
+  token: 'xoxb-1160973993026-1154923438406-41KrIJ0Uy7l1v3pEZ4ygTUbj',
   name: 'task_update_bot'
 });
 
 const OHAYO = 'Ohayo';
 const YES = 'YES';
 const POST = 'POST';
+
+const CHANNEL_GENERAL = 'general';
+const CHANNEL_TASK_UPDATE = 'huubap_task_update';
+
+const MSG_1 = 'Hello';
+const MSG_2 = ', are you ready to send your task update? Type \'YES\' or \'NO\'';
+const MSG_3 = 'What task have you done on previous working day?';
+const MSG_4 = 'What task will you take on today?';
+const MSG_5 = 'Any blockers/roadblocks?';
+const MSG_6 = 'Thanks for the input, below is the summary:';
+const MSG_7 = 'Type \'POST\' to complete task update.';
 
 let channels = [];
 let users = [];
@@ -27,7 +38,7 @@ bot.on('start', () => {
     users = result.members;
   });
 
-  postToChannel('general', 'task_update_bot started...!!!');
+  postToChannel(CHANNEL_GENERAL, 'task_update_bot started...!!!');
 });
 
 // Error Handler
@@ -61,33 +72,33 @@ function handleMessage(data) {
       task.today = -1;
       task.blocker = -1;
     }
-    postToUser(user.name, `Hello ${user.real_name} it\'s time to send the task update, ready? \n Type \'YES\' or \'NO\'`);
+    postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_2}`);
   } else if (data.text.includes(YES)) {
     let user = getUser(data);
     let task = {user_id: user.id, yesterday: -1, today: -1, blocker: -1};
     tasks.push(task);
-    postToUser(user.name, `What did you do previous working day?`);
+    postToUser(user.name, MSG_3);
   } else if (data.text.includes(POST)) {
     console.log('POST');
     let user = getUser(data);
     let task = getUserTask(data);
     console.log(task);
     // tasks.splice(task);
-    postToChannel('huubap_task_update', task);
+    postToChannel(CHANNEL_TASK_UPDATE, task);
   } else if (getUserTask(data)) {
     let user = getUser(data);
     let task = getUserTask(data);
     if (task.yesterday === -1) {
       task.yesterday = data.text;
-      postToUser(user.name, `What do you do today?`);
+      postToUser(user.name, MSG_4);
     } else if (task.today === -1) {
       task.today = data.text;
-      postToUser(user.name, `Any blockers?`);
+      postToUser(user.name, MSG_5);
     } else if (task.blocker === -1) {
       task.blocker = data.text;
-      postToUser(user.name, `Thanks for your status, here is the summary`);
+      postToUser(user.name, MSG_6);
       postToUser(user.name, `Summary`);
-      postToUser(user.name, `Post to channel \n Type \'POST\'`);
+      postToUser(user.name, MSG_7);
     }
   }
 }
