@@ -2,8 +2,8 @@ const SlackBot = require('slackbots');
 const axios = require('axios');
 
 const bot = new SlackBot({
-  token: 'xoxb-1160973993026-1154923438406-04DatVszG88ktjCFsEwKnEVw',
-  name: 'Task Update Bot'
+  token: 'xoxb-1160973993026-1154923438406-gcahXHDU5T423y2HtZOyaE5k',
+  name: 'task_update_bot'
 });
 
 const OHAYO = 'Ohayo';
@@ -28,6 +28,9 @@ const MSG_11 = 'are you on leave tomorrow? Type \'YES\' or \'NO\'';
 let channels = [];
 let users = [];
 let tasks = [];
+
+let yesterdayDate;
+let summary;
 
 // Start Handler
 bot.on('start', () => {
@@ -59,6 +62,10 @@ bot.on('message', data => {
   console.log(data);
   if (data.type !== 'message') {
     return;
+  } 
+  
+  if(data.message && data.message.text && JSON.parse(data.message.text).message === 'OK') {
+    postToChannel(CHANNEL_TASK_UPDATE, "*[Task update on " + yesterdayDate + " ]*", summary);
   }
 
   handleMessage(data);
@@ -99,10 +106,36 @@ function handleMessage(data) {
             task.blocker = data.text;
             postToUser(user.name, MSG_6);
 
-            let yesterdayDate = getYesterdayDate();
-            let summary = getTaskUpdateSummary(user, task);
-            postToUser(user.name, "*[Task update on " + yesterdayDate + " ]*", summary);
-            postToChannel(CHANNEL_TASK_UPDATE, "*[Task update on " + yesterdayDate + " ]*", summary);
+            yesterdayDate = getYesterdayDate();
+            summary = getTaskUpdateSummary(user, task);
+            const interactiveButton = {
+              "attachments": [{
+                  "fallback": "Shame... buttons aren't supported in this land",
+                  "callback_id": "button_tutorial",
+                  "attachment_type": "default",
+                  "actions": [
+                    {
+                      "name": "submit",
+                      "text": "Submit",
+                      "type": "button",
+                      "value": "submit"
+                    }
+                  ]
+              }]
+            };
+
+            const interactiveSummary = {
+              ...summary,
+              ...{ attachments: [
+                {
+                  ...summary.attachments[0], ...interactiveButton.attachments[0]
+                }
+              ] }
+            }
+            
+            postToUser(user.name, "*[Task update on " + yesterdayDate + " ]*", interactiveSummary);
+
+            // postToChannel(CHANNEL_TASK_UPDATE, "*[Task update on " + yesterdayDate + " ]*", summary);
         }
     }
 }
