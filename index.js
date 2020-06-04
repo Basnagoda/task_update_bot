@@ -171,6 +171,7 @@ function getTaskUpdateSummary(user, task) {
     let yesterdayTask = task.yesterday
     let todayTask = task.today
     let blockers = task.blocker
+    let profileIconURL = user.profile.image_24
 
     var messageSummary = {
         "icon_emoji": ":taskupdatebot:",
@@ -178,7 +179,7 @@ function getTaskUpdateSummary(user, task) {
             "mrkdwn_in": ["text"],
             "color": "#36a64f",
             "author_name": "" + authorName + "",
-            "author_icon": "https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4-300x300.png",
+            "author_icon": "" + profileIconURL + "",
             "fields": [{
                     "title": "" + MSG_8 + "",
                     "value": "" + yesterdayTask + "",
