@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const bot = new SlackBot({
   token: 'xoxb-1160973993026-1154923438406-CppxE9DrBZQAg1ycshqd0h48',
-  name: 'Task Update Bot'
+  name: 'Kaizen Task Bot'
 });
 
 const OHAYO = 'ohayo';
