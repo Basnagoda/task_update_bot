@@ -2,7 +2,7 @@ const SlackBot = require('slackbots');
 const axios = require('axios');
 
 const bot = new SlackBot({
-  token: 'xoxb-1160973993026-1154923438406-CppxE9DrBZQAg1ycshqd0h48',
+  token: 'xoxb-1160973993026-1154923438406-93Jw0KVYTB5ZEa3wwv8lwky6',
   name: 'Kaizen Task Bot'
 });
 
@@ -28,6 +28,7 @@ const MSG_11 = 'are you on leave tomorrow? \nType *YES* or *NO*';
 let channels = [];
 let users = [];
 let tasks = [];
+let leaveDetails = [];
 
 let yesterdayDate;
 let summary;
@@ -95,6 +96,8 @@ function handleMessage(data) {
         postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_11}`);
     }
     else if (data.text.toLowerCase().includes(YES) && !channel) {
+        let leave = {date: getFormattedDate(new Date()), user_id: user.id};
+        leaveDetails.push(leave);
         let summary = getLeaveSummary(user);
         postToChannel(CHANNEL_TASK_UPDATE, "*Attention !!!*", summary);
     }
@@ -141,6 +144,11 @@ function handleMessage(data) {
 
             // postToChannel(CHANNEL_TASK_UPDATE, "*[Task update on " + yesterdayDate + " ]*", summary);
         }
+    } else if (channel && isUserOnLeaveToday(data.text)) {
+        let userIdStr = getUserIdStr(data.text);
+        let leaveUser = users.find(item => item.id === userIdStr);
+        let summary = getOtherUserLeaveSummary(user, leaveUser);
+        postToChannel(channel.name, "", summary);
     }
 }
 
@@ -162,6 +170,27 @@ function getUser(data) {
 
 function getUserTask(data) {
   return tasks.find(item => item.user_id === data.user);
+}
+
+function getFormattedDate(date) {
+    return date.toISOString().substring(0, 10);
+}
+
+function isUserOnLeaveToday(message) {
+    let userStr = getUserIdStr(message);
+    let allUsers = getAllLeaveUsers(getFormattedDate(new Date()));
+    return allUsers.find(item => item.user_id === userStr) != null;
+}
+
+function getUserIdStr(message) {
+    let start = message.indexOf('<@') + 2;
+    let end = message.indexOf('>');
+    let res = message.substr(start, end - (start));
+    return res;
+}
+
+function getAllLeaveUsers(date) {
+    return leaveDetails.filter(item => item.date === date);
 }
 
 function postToUser(userChannel, message, params) {
@@ -235,6 +264,28 @@ function getLeaveSummary(user) {
             "author_icon":  "" + profileIconURL + "",
             "fields": [{
                 "title": "I'll be on leave tomorrow",
+                "value": "",
+                "short": false
+            }
+            ]
+        }]
+    };
+    return messageSummary;
+}
+
+function getOtherUserLeaveSummary(user, leaveUser) {
+    let authorName = leaveUser.real_name;
+    let profileIconURL = leaveUser.profile.image_24;
+
+    var messageSummary = {
+        "icon_emoji": ":taskupdatebot:",
+        "attachments": [{
+            "mrkdwn_in": ["text"],
+            "color": "#a64648",
+            "author_name": "" + authorName + "",
+            "author_icon":  "" + profileIconURL + "",
+            "fields": [{
+                "title": `Hello ${user.real_name}, I'm on leave today`,
                 "value": "",
                 "short": false
             }
