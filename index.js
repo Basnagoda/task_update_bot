@@ -2,13 +2,13 @@ const SlackBot = require('slackbots');
 const axios = require('axios');
 
 const bot = new SlackBot({
-  token: 'xoxb-1160973993026-1154923438406-ww5FaeJhvsjijohKCOgoOWvX',
-  name: 'task_update_bot'
+  token: 'xoxb-1160973993026-1154923438406-CppxE9DrBZQAg1ycshqd0h48',
+  name: 'Task Update Bot'
 });
 
-const OHAYO = 'Ohayo';
-const CHECKOUT = 'Checkout';
-const YES = 'YES';
+const OHAYO = 'ohayo';
+const CHECKOUT = 'checkout';
+const YES = 'yes';
 
 const CHANNEL_GENERAL = 'general';
 const CHANNEL_TASK_UPDATE = 'huubap_task_update';
@@ -23,7 +23,7 @@ const MSG_6 = 'Thanks for the input, below is the summary:';
 const MSG_8 = 'What I worked on previous working day:';
 const MSG_9 = 'What task I take today:';
 const MSG_10 = 'Blockers/Roadblocks:';
-const MSG_11 = 'are you on leave tomorrow? Type \'YES\' or \'NO\'';
+const MSG_11 = 'are you on leave tomorrow? \nType *YES* or *NO*';
 
 let channels = [];
 let users = [];
@@ -37,7 +37,7 @@ bot.on('start', () => {
 
   bot.getChannels().then(result => {
     console.log('Channels...!!!');
-    channels = result;
+    channels = result.channels;
   });
 
   bot.getUsers().then(result => {
@@ -45,7 +45,7 @@ bot.on('start', () => {
     users = result.members;
   });
 
-  postToChannel(CHANNEL_GENERAL, 'task_update_bot started...!!!');
+  // postToChannel(CHANNEL_GENERAL, 'task_update_bot started...!!!');
 });
 
 // Error Handler
@@ -59,7 +59,7 @@ bot.on('close', () => console.log('Socket Closed...!!!'));
 
 // Message Handler
 bot.on('message', data => {
-  console.log(data);
+  // console.log(data);
   if (data.type !== 'message') {
     return;
   } 
@@ -77,8 +77,12 @@ function handleMessage(data) {
         return;
 
     let user = getUser(data);
+    let channel = getChannel(data);
 
-    if (data.text.toLowerCase().includes("ohayo")) {
+    if (!user)
+        return;
+
+    if (data.text.toLowerCase().includes(OHAYO) && channel && CHANNEL_GENERAL === channel.name) {
         let task = getUserTask(data);
         if (task) {
             reset(task);
@@ -87,19 +91,19 @@ function handleMessage(data) {
             tasks.push(task);
         }
         postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_2}\n ${MSG_3}`);
-    } else if (data.text.toLowerCase().includes("checkout")) {
+    } else if (data.text.toLowerCase().includes(CHECKOUT) && channel && CHANNEL_GENERAL === channel.name) {
         postToUser(user.name, `${MSG_1} ${user.real_name} ${MSG_11}`);
     }
-    else if (data.text.toLowerCase().includes("yes")) {
+    else if (data.text.toLowerCase().includes(YES) && !channel) {
         let summary = getLeaveSummary(user);
         postToChannel(CHANNEL_TASK_UPDATE, "*Attention !!!*", summary);
     }
-    else if (getUserTask(data)) {
+    else if (getUserTask(data) && !channel) {
         let task = getUserTask(data);
-        if (task.yesterday === -1) {
+        if (task.yesterday === -1 && task.today === -1 && task.blocker === -1) {
             task.yesterday = data.text;
             postToUser(user.name, MSG_4);
-        } else if (task.today === -1) {
+        } else if (task.today === -1 && task.blocker === -1) {
             task.today = data.text;
             postToUser(user.name, MSG_5);
         } else if (task.blocker === -1) {
@@ -146,6 +150,10 @@ function reset(task) {
   task.yesterday = -1;
   task.today = -1;
   task.blocker = -1;
+}
+
+function getChannel(data) {
+    return channels.find(item => item.id === data.channel);
 }
 
 function getUser(data) {
