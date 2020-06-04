@@ -1,4 +1,4 @@
-# @Jokebot
+# @Task Update Bot
 
 > Simple slackbot built with Node.js and Slackbots.js that tells random Chuck Norris and Yo Mama jokes.
 
