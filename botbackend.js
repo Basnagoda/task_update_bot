@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 app.use('/reply', (req, res, next) => {
     console.log("Interactive Component is Triggered !!!!!");
-    res.json({message: "OK"});
+    res.send("Submitted");
 
     // sendMessageToSlackResponseURL(taskUpdateChannelURL.huubap_task_update, {"text": "some summary"}, res);
 

@@ -2,7 +2,7 @@ const SlackBot = require('slackbots');
 const axios = require('axios');
 
 const bot = new SlackBot({
-  token: 'xoxb-1160973993026-1154923438406-gcahXHDU5T423y2HtZOyaE5k',
+  token: 'xoxb-1160973993026-1154923438406-ww5FaeJhvsjijohKCOgoOWvX',
   name: 'task_update_bot'
 });
 
@@ -64,7 +64,7 @@ bot.on('message', data => {
     return;
   } 
   
-  if(data.message && data.message.text && JSON.parse(data.message.text).message === 'OK') {
+  if(data.message && data.message.text && data.message.text === 'Submitted') {
     postToChannel(CHANNEL_TASK_UPDATE, "*[Task update on " + yesterdayDate + " ]*", summary);
   }
 
